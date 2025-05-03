@@ -1,0 +1,17 @@
+#calendar-header {
+    display: flex;
+    flex-direction: row;
+}
+
+#calendar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+#calendar div {
+    height: 5%;
+    width: 5%;
+    display: flex;
+    justify-content: center;
+}
