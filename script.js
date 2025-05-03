@@ -1,21 +1,72 @@
 // date constructor -- Date(year, month, day, hour, minute, second, ms)
 const calendar = document.getElementById('calendar');
+const leftArrow = document.getElementById('left-arrow');
+const rightArrow = document.getElementById('right-arrow');
+const monthHeader = document.getElementById('month')
 const currentDate = new Date().getDate();
-const currentDay = new Date().getDay();
-const currentMonth = new Date().getMonth();
-const currentYear = new Date().getFullYear();
-const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+let currentDay = new Date().getDay();
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+const monthArray = {
+  0: 'January',
+  1: 'February',
+  2: 'March',
+  3: 'April',
+  4: 'May',
+  5: 'June',
+  6: 'July',
+  7: 'August',
+  8: 'September',
+  9: 'October',
+  10: 'November',
+  11: 'December'
+}
 
 console.log(lastDay);
 
-for(let i = 1; i < lastDay; i++) {
-  const dateContainer = document.createElement('div');
-  const number = document.createElement('p');
+function generateCalendar() {
 
-  number.innerHTML = i;
-  dateContainer.appendChild(number);
-  calendar.append(dateContainer);
+  calendar.innerHTML = '';
+  for(let i = 1; i <= lastDay; i++) {
+    const dateContainer = document.createElement('div');
+    const number = document.createElement('p');
+    monthHeader.innerHTML = monthArray[currentMonth]+ ' - ' + currentYear;
+  
+    number.innerHTML = i;
+    dateContainer.appendChild(number);
+    calendar.append(dateContainer);
+  }
 }
+
+function calendarTransition(number) {
+  if (number === 1) {
+    currentMonth = currentMonth - 1;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear = currentYear - 1;
+    }
+    lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+  } else {
+    currentMonth = currentMonth + 1
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear = currentYear + 1;
+    }
+    lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+  }
+  generateCalendar();
+  console.log(currentMonth)
+}
+leftArrow.addEventListener("click", () => {
+  calendarTransition(1)
+});
+rightArrow.addEventListener('click', () => {
+  calendarTransition(2)
+});
+
+generateCalendar();
 
 
 
