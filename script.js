@@ -7,7 +7,10 @@ const currentDate = new Date().getDate();
 let currentDay = new Date().getDay();
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
+const todayMonth = new Date().getMonth();
+const todayYear = new Date().getFullYear();
 let lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+let firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
 const monthArray = {
   0: 'January',
@@ -24,18 +27,38 @@ const monthArray = {
   11: 'December'
 }
 
-console.log(lastDay);
+console.log(currentDate);
+
+function loadEntries(month, day, year) {
+  console.log(month + 1, day, year)
+  //TODO
+}
 
 function generateCalendar() {
 
   calendar.innerHTML = '';
+
+  for(let i = 0; i < firstDay; i++) {
+    const blankSpace = document.createElement('div');
+    blankSpace.classList.add('empty');
+
+    calendar.append(blankSpace);
+  }
+
   for(let i = 1; i <= lastDay; i++) {
     const dateContainer = document.createElement('div');
+    dateContainer.classList.add('hover')
     const number = document.createElement('p');
     monthHeader.innerHTML = monthArray[currentMonth]+ ' - ' + currentYear;
+    if(i == currentDate && currentMonth === todayMonth && currentYear === todayYear) {
+      dateContainer.style.backgroundColor = 'red'
+    }
   
     number.innerHTML = i;
     dateContainer.appendChild(number);
+    dateContainer.addEventListener('click', () => {
+      loadEntries(currentMonth, i, currentYear)
+    });
     calendar.append(dateContainer);
   }
 }
@@ -47,6 +70,7 @@ function calendarTransition(number) {
       currentMonth = 11;
       currentYear = currentYear - 1;
     }
+    firstDay = new Date(currentYear, currentMonth, 1).getDay();
     lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
   } else {
     currentMonth = currentMonth + 1
@@ -54,6 +78,7 @@ function calendarTransition(number) {
       currentMonth = 0;
       currentYear = currentYear + 1;
     }
+    firstDay = new Date(currentYear, currentMonth, 1).getDay();
     lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
   }
   generateCalendar();
