@@ -30,8 +30,33 @@ const monthArray = {
 console.log(currentDate);
 
 function loadEntries(month, day, year) {
-  console.log(month + 1, day, year)
-  //TODO
+  const form = document.getElementById('entry-form');
+  const title = document.getElementById('entry-title');
+  const textarea = document.getElementById('entry-text');
+  const output = document.getElementById('entry-output');
+  const saveBtn = document.getElementById('save-entry');
+
+  const key = `${year}-${month + 1}-${day}`; // e.g., "2025-5-7"
+
+  form.style.display = 'block';
+  title.innerText = `Entries for ${monthArray[month]} ${day}, ${year}`;
+
+  // Load from localStorage
+  const savedEntry = localStorage.getItem(key);
+  textarea.value = savedEntry || '';
+  output.innerText = savedEntry ? `Last saved: ${savedEntry}` : 'No previous entry.';
+
+  // Save on button click
+  saveBtn.onclick = function () {
+    const entry = textarea.value.trim();
+    if (entry) {
+      localStorage.setItem(key, entry);
+      output.innerText = `Last saved: ${entry}`;
+    } else {
+      localStorage.removeItem(key);
+      output.innerText = 'Entry cleared.';
+    }
+  };
 }
 
 function generateCalendar() {
@@ -92,39 +117,3 @@ rightArrow.addEventListener('click', () => {
 });
 
 generateCalendar();
-
-
-
-
-
-
-/*
-
-function generateCalendar(month, year) {
-    const firstDay = new Date(year, month, 1).getDay(); // Day of week (0-6)
-    const daysInMonth = new Date(year, month + 1, 0).getDate(); // Last day of month
-  
-    console.log(`\n${year} - ${month + 1}`);
-    console.log("Sun Mon Tue Wed Thu Fri Sat");
-  
-    let day = 1;
-    let output = "";
-  
-    // Add leading spaces for first row
-    for (let i = 0; i < firstDay; i++) {
-      output += "    ";
-    }
-  
-    for (let i = firstDay; day <= daysInMonth; i++) {
-      output += day.toString().padStart(3, " ") + " ";
-      if (i % 7 === 6) {
-        output += "\n";
-      }
-      day++;
-    }
-  
-    console.log(output);
-  }
-  
-  generateCalendar(3, 2025); // April 2025 (note: months are 0-indexed)
-  */
