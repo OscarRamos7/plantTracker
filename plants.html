@@ -18,7 +18,21 @@
         <textarea id="entry-text" rows="4" cols="30" placeholder="Write your note..."></textarea><br/>
         <button id="save-entry">Save</button>
         <div id="entry-output"></div>
-      </div>
+    </div>
+    <h2>My Plants</h2>
+    <form id="plant-form">
+    <input type="text" id="plant-name" placeholder="Plant name" required>
+    <input type="text" id="plant-type" placeholder="Plant type">
+    <input type="url" id="plant-photo" placeholder="Photo URL (optional)">
+    <button type="submit">Add Plant</button>
+    </form>
+
+    
+    <select id="plant-selector">
+        <option disabled selected>Select a plant</option>
+    </select>
+
+    <div id="plant-list"></div>
 
     <script src="script.js"></script>
 </body>
