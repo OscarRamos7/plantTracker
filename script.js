@@ -79,29 +79,58 @@ function loadEntries(month, day, year) {
   const selectedPlantIndex = plantSelector.value;
   const plants = JSON.parse(localStorage.getItem('plants') || '[]');
 
+  output.innerHTML = '';
+  textarea.value = '';
+  form.style.display = 'block';
+
+  // Show all notes on this day if no plant is selected
   if (!plants[selectedPlantIndex]) {
-    alert('Please select a plant first!');
+    title.innerText = `All plants on ${monthArray[month]} ${day}, ${year}`;
+
+    const entries = plants.map(plant => {
+      const entryKey = `${plant.name}_${dateKey}`;
+      const data = JSON.parse(localStorage.getItem(entryKey));
+      if (data) {
+        return `<strong>${plant.name}</strong><br>
+                ${data.note ? `Note: ${data.note}<br>` : ''}
+                ${data.watered ? 'Watered<br>' : ''}
+                ${data.fertilized ? 'Fertilized<br>' : ''}<br>`;
+      }
+      return '';
+    }).filter(Boolean);
+
+    output.innerHTML = entries.length > 0 ? entries.join('') : 'No entries for any plant.';
     return;
   }
 
+  // Otherwise, show a single plant entry editor
   const plantName = plants[selectedPlantIndex].name;
-  const entryKey = `${plantName}_${dateKey}`; // e.g., "Monstera_2025-5-8"
-
-  form.style.display = 'block';
+  const entryKey = `${plantName}_${dateKey}`;
   title.innerText = `Note for ${plantName} on ${monthArray[month]} ${day}, ${year}`;
 
-  const saved = localStorage.getItem(entryKey);
-  textarea.value = saved || '';
-  output.innerText = saved ? `Saved note: ${saved}` : 'No note saved.';
+  const watered = document.getElementById('watered');
+  const fertilized = document.getElementById('fertilized');
 
-  saveBtn.onclick = function () {
-    const entry = textarea.value.trim();
-    if (entry) {
-      localStorage.setItem(entryKey, entry);
-      output.innerText = `Saved note: ${entry}`;
+  const saved = JSON.parse(localStorage.getItem(entryKey) || '{}');
+  textarea.value = saved.note || '';
+  watered.checked = saved.watered || false;
+  fertilized.checked = saved.fertilized || false;
+
+  output.innerText = saved.note || 'No note saved.';
+
+  saveBtn.onclick = () => {
+    const entry = {
+      note: textarea.value.trim(),
+      watered: watered.checked,
+      fertilized: fertilized.checked
+    };
+
+    if (entry.note || entry.watered || entry.fertilized) {
+      localStorage.setItem(entryKey, JSON.stringify(entry));
+      output.innerText = `Saved: ${entry.note || 'No text'}${entry.watered ? ', 💧 Watered' : ''}${entry.fertilized ? ', 🌿 Fertilized' : ''}`;
     } else {
       localStorage.removeItem(entryKey);
-      output.innerText = 'Note cleared.';
+      output.innerText = 'Entry cleared.';
     }
   };
 }
@@ -165,6 +194,27 @@ function calendarTransition(number) {
   generateCalendar();
   console.log(currentMonth)
 }
+
+//reset entries function
+/*function resetOnlyEntries() {
+  const keysToRemove = [];
+
+  // Loop through all keys in localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+
+    // If the key includes an underscore and looks like a calendar entry
+    if (/_\d{4}-\d{1,2}-\d{1,2}$/.test(key)) {
+      keysToRemove.push(key);
+    }
+  }
+
+  // Remove matching keys
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+
+  alert("All calendar entries have been reset.");
+  location.reload(); // Optional: Refresh the page
+} */
 
 //sets event listeners and calls generateCalendar
 leftArrow.addEventListener("click", () => {
