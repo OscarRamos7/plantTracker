@@ -15,7 +15,15 @@
     <div id="calendar"></div>
     <div id="entry-form" style="display: none;">
         <h3 id="entry-title"></h3>
-        <textarea id="entry-text" rows="4" cols="30" placeholder="Write your note..."></textarea><br/>
+
+        <label>
+            <input type="checkbox" id="watered"> Watered
+        </label>
+        <label>
+            <input type="checkbox" id="fertilized"> Fertilized
+        </label><br><br>
+
+        <textarea id="entry-text" rows="4" cols="30" placeholder="Write your note..."></textarea><br>
         <button id="save-entry">Save</button>
         <div id="entry-output"></div>
     </div>
@@ -33,6 +41,7 @@
     </select>
 
     <div id="plant-list"></div>
+    <!-- <button onclick="resetOnlyEntries()">Reset Calendar Entries</button> -->
 
     <script src="script.js"></script>
 </body>
