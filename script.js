@@ -30,16 +30,20 @@ const monthArray = {
 console.log(currentDate);
 
 function loadPlants() {
+  //grabs the plants object from local storage
   const plants = JSON.parse(localStorage.getItem('plants') || '[]');
   const selector = document.getElementById('plant-selector');
   const list = document.getElementById('plant-list');
 
-  selector.innerHTML = '<option disabled selected>Select a plant</option>';
+  //sets selector to default null option
+  selector.innerHTML = '<option selected>All plants</option>';
+  //clears list
   list.innerHTML = '';
 
+  //iterates through plants and creates an option in selector for each one as well as creating a plant card
   plants.forEach((plant, index) => {
     const option = document.createElement('option');
-    option.value = index;
+    option.value = index; //index is an argument that can be passed into the callback function that keeps index of current element
     option.textContent = plant.name;
     selector.appendChild(option);
 
@@ -50,6 +54,7 @@ function loadPlants() {
   });
 }
 
+//grabs info submitted from plant form and pushes it into plants object as a new plant and then calls loadPlants to refresh
 document.getElementById('plant-form').addEventListener('submit', function (e) {
   e.preventDefault();
   const name = document.getElementById('plant-name').value.trim();
@@ -64,8 +69,6 @@ document.getElementById('plant-form').addEventListener('submit', function (e) {
   loadPlants();
 });
 
-loadPlants();
-
 //loads entries of chosen day based on plant
 function loadEntries(month, day, year) {
   const form = document.getElementById('entry-form');
@@ -77,40 +80,50 @@ function loadEntries(month, day, year) {
 
   const dateKey = `${year}-${month + 1}-${day}`;
   const selectedPlantIndex = plantSelector.value;
+  console.log(selectedPlantIndex, 'hello')
   const plants = JSON.parse(localStorage.getItem('plants') || '[]');
 
+  //clears previous entries in output and text area
   output.innerHTML = '';
   textarea.value = '';
   form.style.display = 'block';
 
-  // Show all notes on this day if no plant is selected
+  // Show all notes on this day if all plants is selected
   if (!plants[selectedPlantIndex]) {
+    //sets entry title
     title.innerText = `All plants on ${monthArray[month]} ${day}, ${year}`;
 
     const entries = plants.map(plant => {
-      const entryKey = `${plant.name}_${dateKey}`;
+      const entryKey = `${plant.name}_${dateKey}`; //`pothos_2025-05-20`
+      //get data for specific plant and date using entryKey
       const data = JSON.parse(localStorage.getItem(entryKey));
+      //if data is true map creates a new entry in the entries array containing the data returned
       if (data) {
         return `<strong>${plant.name}</strong><br>
                 ${data.note ? `Note: ${data.note}<br>` : ''}
                 ${data.watered ? 'Watered<br>' : ''}
                 ${data.fertilized ? 'Fertilized<br>' : ''}<br>`;
       }
+      //if data is not true map creates an empty entry in the entries array and then filter keeps only the entries which are true (the ones that arent empty)
       return '';
     }).filter(Boolean);
 
+    //if the entries array's length is greater than zero then output.innerHTML will display entries else it will display the written message
     output.innerHTML = entries.length > 0 ? entries.join('') : 'No entries for any plant.';
+    //return to exit the function
     return;
   }
 
   // Otherwise, show a single plant entry editor
-  const plantName = plants[selectedPlantIndex].name;
-  const entryKey = `${plantName}_${dateKey}`;
+  const plantName = plants[selectedPlantIndex].name; //plants[1].name
+  console.log(plants[selectedPlantIndex]) //will console log the info of plant within plants in the position of selectedPlantIndex (in this case the 1 position)
+  const entryKey = `${plantName}_${dateKey}`; //`pothos_2025-05-20`
   title.innerText = `Note for ${plantName} on ${monthArray[month]} ${day}, ${year}`;
 
   const watered = document.getElementById('watered');
   const fertilized = document.getElementById('fertilized');
 
+  //fills out checkboxes and text if located in local storage else it appears empty
   const saved = JSON.parse(localStorage.getItem(entryKey) || '{}');
   textarea.value = saved.note || '';
   watered.checked = saved.watered || false;
@@ -118,6 +131,7 @@ function loadEntries(month, day, year) {
 
   output.innerText = saved.note || 'No note saved.';
 
+  //saves all info from form into an object and saves that object to entry variable
   saveBtn.onclick = () => {
     const entry = {
       note: textarea.value.trim(),
@@ -125,6 +139,7 @@ function loadEntries(month, day, year) {
       fertilized: fertilized.checked
     };
 
+    //if any one of the entries from the entry object are true then entry is saved into local storage else entry is deleted from local storage
     if (entry.note || entry.watered || entry.fertilized) {
       localStorage.setItem(entryKey, JSON.stringify(entry));
       output.innerText = `Saved: ${entry.note || 'No text'}${entry.watered ? ', 💧 Watered' : ''}${entry.fertilized ? ', 🌿 Fertilized' : ''}`;
@@ -223,5 +238,7 @@ leftArrow.addEventListener("click", () => {
 rightArrow.addEventListener('click', () => {
   calendarTransition(2)
 });
+
+loadPlants();
 
 generateCalendar();
