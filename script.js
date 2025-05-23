@@ -30,7 +30,7 @@ const monthArray = {
 console.log(currentDate);
 
 function loadPlants() {
-  //grabs the plants object from local storage
+  //grabs the plants object from local storage [{name:pothos, type: pothos, photo: pothos}, {}, {}] (array of objects)
   const plants = JSON.parse(localStorage.getItem('plants') || '[]');
   const selector = document.getElementById('plant-selector');
   const list = document.getElementById('plant-list');
@@ -65,7 +65,7 @@ document.getElementById('plant-form').addEventListener('submit', function (e) {
   plants.push({ name, type, photo });
   localStorage.setItem('plants', JSON.stringify(plants));
 
-  this.reset();
+  this.reset(); // in this case this refers to plant-form and reset is a method which clears all input fields in the form
   loadPlants();
 });
 
@@ -151,37 +151,62 @@ function loadEntries(month, day, year) {
 }
 
 function generateCalendar() {
-
-  //empties calendar
   calendar.innerHTML = '';
 
-  //creates blank spaces on calendar by adding an empty space every time i is less than firstDay of month (sunday = 0, sat = 6)
-  for(let i = 0; i < firstDay; i++) {
+  const selectedPlantIndex = document.getElementById('plant-selector').value;
+  const plants = JSON.parse(localStorage.getItem('plants') || '[]');
+  const selectedPlant = plants[selectedPlantIndex];
+
+  // Recalculate firstDay and lastDay in case month changed
+  firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  // Blank spaces before first day
+  for (let i = 0; i < firstDay; i++) {
     const blankSpace = document.createElement('div');
     blankSpace.classList.add('empty');
-
     calendar.append(blankSpace);
   }
 
-  //fills in rest of calendar as long as i is <= last day, also sets calendar header
-  for(let i = 1; i <= lastDay; i++) {
+  // Days of the month
+  for (let day = 1; day <= lastDay; day++) {
     const dateContainer = document.createElement('div');
-    dateContainer.classList.add('hover')
+    dateContainer.classList.add('hover');
     const number = document.createElement('p');
-    monthHeader.innerHTML = monthArray[currentMonth]+ ' - ' + currentYear;
-    //sets background of current day to red
-    if(i == currentDate && currentMonth === todayMonth && currentYear === todayYear) {
-      dateContainer.style.backgroundColor = 'red'
-    }
-  
-    number.innerHTML = i;
+    number.innerHTML = day;
     dateContainer.appendChild(number);
-    //adds event listener to each date on calendar and passes date to loadEntries
+
+    // Create dot if entry exists for this day & plant
+    if (selectedPlant) {
+      const dateKey = `${selectedPlant.name}_${currentYear}-${currentMonth + 1}-${day}`;
+      const hasEntry = localStorage.getItem(dateKey);
+
+      if (hasEntry) {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        dateContainer.appendChild(dot);
+      }
+    }
+
+    // Highlight today
+    if (
+      day == currentDate &&
+      currentMonth === todayMonth &&
+      currentYear === todayYear
+    ) {
+      dateContainer.style.backgroundColor = 'red';
+    }
+
+    // Click to open entry
     dateContainer.addEventListener('click', () => {
-      loadEntries(currentMonth, i, currentYear)
+      loadEntries(currentMonth, day, currentYear);
     });
+
     calendar.append(dateContainer);
   }
+
+  // Update month title
+  monthHeader.innerHTML = `${monthArray[currentMonth]} - ${currentYear}`;
 }
 
 function calendarTransition(number) {
@@ -242,3 +267,7 @@ rightArrow.addEventListener('click', () => {
 loadPlants();
 
 generateCalendar();
+
+document.getElementById('plant-selector').addEventListener('change', () => {
+  generateCalendar(); // Refresh calendar with filtered dots
+});
