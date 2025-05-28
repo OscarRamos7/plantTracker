@@ -155,7 +155,6 @@ function generateCalendar() {
 
   const selectedPlantIndex = document.getElementById('plant-selector').value;
   const plants = JSON.parse(localStorage.getItem('plants') || '[]');
-  const selectedPlant = plants[selectedPlantIndex];
 
   // Recalculate firstDay and lastDay in case month changed
   firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -176,16 +175,36 @@ function generateCalendar() {
     number.innerHTML = day;
     dateContainer.appendChild(number);
 
-    // Create dot if entry exists for this day & plant
-    if (selectedPlant) {
-      const dateKey = `${selectedPlant.name}_${currentYear}-${currentMonth + 1}-${day}`;
-      const hasEntry = localStorage.getItem(dateKey);
+    //TODO learn this function properly
+    const isAllPlantsSelected = !plants[selectedPlantIndex];
 
-      if (hasEntry) {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        dateContainer.appendChild(dot);
+    let hasEntry = false;
+
+    if (isAllPlantsSelected) {
+      for (const plant of plants) {
+        const dateKey = `${plant.name}_${currentYear}-${currentMonth + 1}-${day}`;
+        if (localStorage.getItem(dateKey)) {
+          hasEntry = true;
+          break;
+        }
       }
+    } else {
+      const selectedPlant = plants[selectedPlantIndex];
+      const dateKey = `${selectedPlant.name}_${currentYear}-${currentMonth + 1}-${day}`;
+      hasEntry = localStorage.getItem(dateKey);
+    }
+
+    if (hasEntry) {
+      dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 0.5)';
+      dateContainer.style.borderRadius = '20px';
+
+      dateContainer.addEventListener('mouseenter', () => {
+        dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 1)';
+      });
+
+      dateContainer.addEventListener('mouseleave', () => {
+        dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 0.5)';
+      });
     }
 
     // Highlight today
@@ -194,7 +213,7 @@ function generateCalendar() {
       currentMonth === todayMonth &&
       currentYear === todayYear
     ) {
-      dateContainer.style.backgroundColor = 'red';
+      dateContainer.style.color = 'red';
     }
 
     // Click to open entry
