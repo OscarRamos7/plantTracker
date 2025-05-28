@@ -31,10 +31,3 @@
 .empty {
     background-color: none;
 }
-
-.dot {
-  width: 6px;
-  height: 6px;
-  background-color: green;
-  border-radius: 50%;
-}
