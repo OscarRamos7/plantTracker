@@ -31,3 +31,7 @@
 .empty {
     background-color: none;
 }
+
+.selected {
+    background-color: cadetblue;
+}

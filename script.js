@@ -29,6 +29,7 @@ const monthArray = {
 
 console.log(currentDate);
 
+//TODO make plant cards able to load a plants entries
 function loadPlants() {
   //grabs the plants object from local storage [{name:pothos, type: pothos, photo: pothos}, {}, {}] (array of objects)
   const plants = JSON.parse(localStorage.getItem('plants') || '[]');
@@ -39,7 +40,7 @@ function loadPlants() {
   selector.innerHTML = '<option selected>All plants</option>';
   //clears list
   list.innerHTML = '';
-
+  //TODO remove selected from plant card if clicked on when already selected
   //iterates through plants and creates an option in selector for each one as well as creating a plant card
   plants.forEach((plant, index) => {
     const option = document.createElement('option');
@@ -50,6 +51,17 @@ function loadPlants() {
     const plantCard = document.createElement('div');
     plantCard.innerHTML = `<strong>${plant.name}</strong> (${plant.type || 'Unknown'})<br>
       ${plant.photo ? `<img src="${plant.photo}" alt="${plant.name}" width="100">` : ''}`;
+    plantCard.classList.add('hover')
+    plantCard.addEventListener('click', () => {
+
+      document.querySelectorAll('#plant-list .selected').forEach(card => {
+        card.classList.remove('selected');
+      });
+      plantCard.classList.add('selected');
+
+      selector.value = index;
+      generateCalendar();
+    })
     list.appendChild(plantCard);
   });
 }
@@ -176,24 +188,33 @@ function generateCalendar() {
     dateContainer.appendChild(number);
 
     //TODO learn this function properly
+    //store a statement of plants[selectedPlantIndex] being null in a variable
+    //this is done to check if the all plants option is selected
+    //this works because the all plants option does not exist in the plants array
     const isAllPlantsSelected = !plants[selectedPlantIndex];
 
     let hasEntry = false;
 
+    //if isAllPlantsSelected is true that means all plants option has been selected on menu
     if (isAllPlantsSelected) {
+      /*loop through each plant in plant array and 
+      check if there is an entry on the specific day we are currently looping through*/
       for (const plant of plants) {
         const dateKey = `${plant.name}_${currentYear}-${currentMonth + 1}-${day}`;
+        //if entry is found exit if else statement
         if (localStorage.getItem(dateKey)) {
           hasEntry = true;
           break;
         }
       }
-    } else {
+    } else { //if all plants is not selected check entry for selected plant on current day we are looping through
       const selectedPlant = plants[selectedPlantIndex];
       const dateKey = `${selectedPlant.name}_${currentYear}-${currentMonth + 1}-${day}`;
-      hasEntry = localStorage.getItem(dateKey);
+      hasEntry = localStorage.getItem(dateKey); //this sets hasEntry to true if there is an entry
     }
 
+    //if hasEntry is true gives current loop through date green background
+    //else date keeps the background given hover class
     if (hasEntry) {
       dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 0.5)';
       dateContainer.style.borderRadius = '20px';
