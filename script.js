@@ -201,31 +201,55 @@ function generateCalendar() {
       check if there is an entry on the specific day we are currently looping through*/
       for (const plant of plants) {
         const dateKey = `${plant.name}_${currentYear}-${currentMonth + 1}-${day}`;
-        //if entry is found exit if else statement
-        if (localStorage.getItem(dateKey)) {
-          hasEntry = true;
+        //if entry is found mark date container
+        const entry = localStorage.getItem(dateKey)
+        if (entry) {
+          dateContainer.style.backgroundColor = 'rgba(0, 200, 100, 0.5)';
+
+          dateContainer.addEventListener('mouseenter', () => {
+            dateContainer.style.filter = 'brightness(1.2)';
+          });
+
+          dateContainer.addEventListener('mouseleave', () => {
+            dateContainer.style.filter = 'brightness(1)';
+          });
+
+          dateContainer.style.borderRadius = '20px';
           break;
         }
       }
     } else { //if all plants is not selected check entry for selected plant on current day we are looping through
       const selectedPlant = plants[selectedPlantIndex];
       const dateKey = `${selectedPlant.name}_${currentYear}-${currentMonth + 1}-${day}`;
-      hasEntry = localStorage.getItem(dateKey); //this sets hasEntry to true if there is an entry
-    }
+      hasEntry = JSON.parse(localStorage.getItem(dateKey)); //this parses selected plant data and stores inside of hasEntry
 
-    //if hasEntry is true gives current loop through date green background
-    //else date keeps the background given hover class
-    if (hasEntry) {
-      dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 0.5)';
-      dateContainer.style.borderRadius = '20px';
+      //if hasEntry is true gives current loop through date background depending on info
+      //else date keeps the background given hover class
+      if (hasEntry) {
+        const isWatered = hasEntry.watered;
+        const isFertilized = hasEntry.fertilized;
 
-      dateContainer.addEventListener('mouseenter', () => {
-        dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 1)';
-      });
+        if (isWatered && isFertilized) {
+          dateContainer.style.backgroundColor = 'rgba(0, 200, 100, 0.5)'; // green for both
+        } else if (isWatered) {
+          dateContainer.style.backgroundColor = 'rgba(0, 128, 255, 0.5)'; // blue for watered
+        } else if (isFertilized) {
+          dateContainer.style.backgroundColor = 'rgba(200, 150, 0, 0.5)'; // yellow for fertilized
+        } else {
+          dateContainer.style.backgroundColor = 'rgba(120, 120, 120, 0.5)'; // gray for note only
+        }
 
-      dateContainer.addEventListener('mouseleave', () => {
-        dateContainer.style.backgroundColor = 'rgba(0, 168, 107, 0.5)';
-      });
+        dateContainer.style.borderRadius = '20px';
+
+        // Optional: hover effect
+        dateContainer.addEventListener('mouseenter', () => {
+          dateContainer.style.filter = 'brightness(1.2)';
+        });
+
+        dateContainer.addEventListener('mouseleave', () => {
+          dateContainer.style.filter = 'brightness(1)';
+        });
+      }
     }
 
     // Highlight today
